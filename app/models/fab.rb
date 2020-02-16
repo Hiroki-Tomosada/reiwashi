@@ -1,0 +1,2 @@
+class Fab < ApplicationRecord
+end
