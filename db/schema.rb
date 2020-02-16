@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_02_15_082606) do
+ActiveRecord::Schema.define(version: 2020_02_16_045920) do
 
   create_table "fabs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "word_id"
@@ -25,8 +25,11 @@ ActiveRecord::Schema.define(version: 2020_02_15_082606) do
     t.string "sex"
     t.integer "age"
     t.string "place"
+    t.string "password_digest"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "token"
+    t.index ["token"], name: "index_users_on_token", unique: true
   end
 
   create_table "words", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
