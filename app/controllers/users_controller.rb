@@ -1,7 +1,8 @@
 class UsersController < ApplicationController
   before_action :set_user, only: [:show, :update, :destroy]
 
-  #skip_before_action :authenticate!, only: [:create, :sign_in]
+  before_action :authenticate, except: [:index, :sign_in, :create]
+  before_action :current_user, except: [:index, :sign_in, :create]
 
   def sign_in
     @user = User.find_by(email: params[:email])
@@ -32,7 +33,7 @@ class UsersController < ApplicationController
 
   # GET /users/1
   def show
-    
+
     render json: @user
   end
 
@@ -71,5 +72,19 @@ class UsersController < ApplicationController
     # Only allow a trusted parameter "white list" through.
     def user_params
       params.require(:user).permit(:name, :email, :sex, :birthday, :place, :password)
+    end
+    
+    # 認証処理
+    def authenticate
+      authenticate_or_request_with_http_token do |token, options|
+        # Compare the tokens in a time-constant manner, to mitigate
+        # timing attacks.
+        #ActiveSupport::SecurityUtils.secure_compare(token, TOKEN)
+        User.find_by(token: token).present?
+      end
+    end
+
+    def current_user
+      @current_user ||= User.find_by(token: request.headers['Authorization'].split[1])
     end
 end
