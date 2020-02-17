@@ -1,6 +1,9 @@
 class WordsController < ApplicationController
   before_action :set_word, only: [:show, :update, :destroy]
 
+  before_action :authenticate, except: [:index]
+  before_action :current_user, except: [:index]
+
   # GET /words
   def index
     @words = Word.all
@@ -19,6 +22,7 @@ class WordsController < ApplicationController
 
     if @word.save
       render json: @word, status: :created, location: @word
+      #render json: @current_user
     else
       render json: @word.errors, status: :unprocessable_entity
     end
@@ -49,4 +53,19 @@ class WordsController < ApplicationController
       #params.fetch(:word, {})
       params.require(:word).permit(:name, :tag_id)
     end
+
+    # 認証処理
+    def authenticate
+      authenticate_or_request_with_http_token do |token, options|
+        # Compare the tokens in a time-constant manner, to mitigate
+        # timing attacks.
+        #ActiveSupport::SecurityUtils.secure_compare(token, TOKEN)
+        User.find_by(token: token).present?
+      end
+    end
+
+    def current_user
+      @current_user ||= User.find_by(token: request.headers['Authorization'].split[1])
+    end
+      
 end
