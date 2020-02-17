@@ -27,7 +27,7 @@ class UsersController < ApplicationController
   def index
     @users = User.all
 
-    render json: @users
+    render json: {status: "success", users: @users}
   end
 
   # GET /users/1
@@ -38,10 +38,10 @@ class UsersController < ApplicationController
   # POST /users
   def create
     #@user = User.new(user_params)
-    @user = User.new(name: params[:name], email: params[:email], sex: params[:sex], age: params[:age], place: params[:place], password: params[:password], )
+    @user = User.new(name: params[:name], email: params[:email], sex: params[:sex], birthday: params[:birthday], place: params[:place], password: params[:password])
 
     if @user.save
-      render json: @user, status: :created, location: @user
+      render json: @user.token, status: :created, location: @user
     else
       render json: @user.errors, status: :unprocessable_entity
     end
@@ -69,6 +69,6 @@ class UsersController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def user_params
-      params.require(:user).permit(:name, :email, :sex, :age, :place, :password)
+      params.require(:user).permit(:name, :email, :sex, :birthday, :place, :password)
     end
 end
