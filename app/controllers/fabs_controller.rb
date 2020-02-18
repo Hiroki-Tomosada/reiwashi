@@ -2,33 +2,56 @@ class FabsController < ApplicationController
   #before_action :set_fab, only: [:show, :update, :destroy]
   before_action :set_fab, only: [:update, :destroy]
 
-  before_action :authenticate, except: [:index]
-  before_action :current_user, except: [:index]
+  before_action :authenticate, except: [:index, :api]
+  before_action :current_user, except: [:index, :api]
 
   # GET /fabs/api
   def api
+    require 'date'
+    
     #render :text => "id = #{params[:id]}"
     #render plain: "period = #{params[:period]}, category = #{params[:category]}, private = #{params[:private]}"
-
-    period = params[:period]
-    page = params[:page]
-    age = params[:age]
-    sex = params[:sex]
-
     
+    @period = params[:period]
+    @page = params[:page].to_i
+    @age = params[:age].to_i
+    @sex = params[:sex]
 
-    unless privates.blank? then
-      #@fabs = Fab.where
-      render plain: "[Private mode] period = #{period}, category = #{category}, private = #{privates}"
+    @now_date = Date.today
+
+    if @period == 'year' then
+      @start_date = Date.today - @page.year
+      @end_date = Date.today
+
+      #render plain: @start_date
+
+    elsif @period == 'month' then
+      @start_date = Date.today
+      @end_date = Date.today
+
+    elsif @period == 'week' then
+      @start_date = Date.today
+      @end_date = Date.today
+
+      render plain: "Week mode !"
     else
-      if category.blank? then
-        #@fabs = Fab.where(["name = ? and tel = ?", "hoge太郎", "090-1111-2222"])
-        render plain: "[Full category mode] period = #{period}, category = #{category}, private = #{privates}"
-      else
-        #@fabs = Fab.where(["name = ? and tel = ?", "hoge太郎", "090-1111-2222"])
-        render plain: "[Category mode] period = #{period}, category = #{category}, private = #{privates}"
-      end
+      render json: {status: "error"}
     end
+    
+   
+
+    #unless privates.blank? then
+      #@fabs = Fab.where
+    #  render plain: "[Private mode] period = #{period}, category = #{category}, private = #{privates}"
+    #else
+    #  if category.blank? then
+        #@fabs = Fab.where(["name = ? and tel = ?", "hoge太郎", "090-1111-2222"])
+    #    render plain: "[Full category mode] period = #{period}, category = #{category}, private = #{privates}"
+    #  else
+        #@fabs = Fab.where(["name = ? and tel = ?", "hoge太郎", "090-1111-2222"])
+    #    render plain: "[Category mode] period = #{period}, category = #{category}, private = #{privates}"
+    #  end
+    #end
     
   end
 
