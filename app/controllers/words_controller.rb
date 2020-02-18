@@ -18,13 +18,19 @@ class WordsController < ApplicationController
 
   # POST /words
   def create
-    @word = Word.new(word_params)
+    # @word = Word.new(word_params)
+    @word = Word.new(name: word_params[:name], user_id: @current_user.id)
 
-    if @word.save
-      render json: @word, status: :created, location: @word
-      #render json: @current_user
+    if Word.find_by(name: @word.name).present?
+      render json: {status: "already"}
     else
-      render json: @word.errors, status: :unprocessable_entity
+      if @word.save
+        #render json: @word, status: :created, location: @word
+        render json: {status: "success"}
+      else
+        #render json: @word.errors, status: :unprocessable_entity
+        render json: {status: "error"}
+      end
     end
   end
 
@@ -51,7 +57,7 @@ class WordsController < ApplicationController
     # Only allow a trusted parameter "white list" through.
     def word_params
       #params.fetch(:word, {})
-      params.require(:word).permit(:name, :tag_id)
+      params.require(:word).permit(:name, :user_id, :tag_id)
     end
 
     # 認証処理

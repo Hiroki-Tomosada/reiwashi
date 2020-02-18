@@ -1,5 +1,6 @@
 class FabsController < ApplicationController
-  before_action :set_fab, only: [:show, :update, :destroy]
+  #before_action :set_fab, only: [:show, :update, :destroy]
+  before_action :set_fab, only: [:update, :destroy]
 
   before_action :authenticate, except: [:index]
   before_action :current_user, except: [:index]
@@ -10,8 +11,11 @@ class FabsController < ApplicationController
     #render plain: "period = #{params[:period]}, category = #{params[:category]}, private = #{params[:private]}"
 
     period = params[:period]
-    category = params[:category]
-    privates = params[:private]
+    page = params[:page]
+    age = params[:age]
+    sex = params[:sex]
+
+    
 
     unless privates.blank? then
       #@fabs = Fab.where
@@ -37,17 +41,31 @@ class FabsController < ApplicationController
 
   # GET /fabs/1
   def show
-    render json: @fab
+    #render json: @fab
+    fab = Fab.find_by(word_id: params[:id], user_id: @current_user.id)
+    render json: fab
+  end
+
+  def mypage
+    fabs = Fab.where(user_id: @current_user)
+    render json: fabs
   end
 
   # POST /fabs
   def create
-    @fab = Fab.new(fab_params)
+    #@fab = Fab.new(fab_params)
+    @fab = Fab.new(word_id: fab_params[:word_id], user_id: @current_user.id)
 
-    if @fab.save
-      render json: @fab, status: :created, location: @fab
+    if Fab.find_by(word_id: @fab.word_id, user_id: @fab.user_id).present?
+      render json: {status: "already"}
     else
-      render json: @fab.errors, status: :unprocessable_entity
+      if @fab.save
+        #render json: @fab, status: :created, location: @fab
+        render json: {status: "success"}
+      else
+        #render json: @fab.errors, status: :unprocessable_entity
+        render json: {status: "error"}
+      end
     end
   end
 
@@ -62,7 +80,14 @@ class FabsController < ApplicationController
 
   # DELETE /fabs/1
   def destroy
-    @fab.destroy
+    #@fab.destroy
+    fab = Fab.find_by(word_id: params[:id], user_id: @current_user.id)
+    if fab.present?
+      fab.destroy
+      render json: {status: "success"}
+    else
+      render json: {status: "nothing"}
+    end
   end
 
   private
