@@ -26,7 +26,7 @@ ActiveRecord::Schema.define(version: 2020_02_16_045920) do
     t.string "name"
     t.string "email"
     t.string "sex"
-    t.date "birthday"
+    t.datetime "birthday"
     t.string "place"
     t.string "password_digest"
     t.datetime "created_at", null: false

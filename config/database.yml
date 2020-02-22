@@ -19,14 +19,14 @@ default: &default
 
 development:
   <<: *default
-  database: reiwa_development2
+  database: reiwa_development3
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: reiwa_test2
+  database: reiwa_test3
 
 # As with config/secrets.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
@@ -49,6 +49,6 @@ test:
 #
 production:
   <<: *default
-  database: reiwa_production2
+  database: reiwa_production3
   username: reiwa
   password: Hannpanai_2020
