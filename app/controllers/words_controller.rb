@@ -146,7 +146,7 @@ class WordsController < ApplicationController
     fabs = Fab.where(word_id: @word.id)
     fabs.destroy_all
     @word.destroy
-    
+
     render json: {status: "success"}
   end
 
