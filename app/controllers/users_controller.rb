@@ -31,12 +31,16 @@ class UsersController < ApplicationController
     #@user = User.new(user_params)
     @user = User.new(name: params[:name], email: params[:email], sex: params[:sex], birthday: params[:birthday], place: params[:place], password: params[:password])
 
-    if @user.save
-      #render json: @user.token, status: :created, location: @user
-      render json: {status: "success", token: @user.token}
+    if User.find_by(email: params[:email]).present?
+      render json: {status: "already"}
     else
-      #render json: @user.errors, status: :unprocessable_entity
-      render json: {status: "error"}
+      if @user.save
+        #render json: @user.token, status: :created, location: @user
+        render json: {status: "success", token: @user.token}
+      else
+        #render json: @user.errors, status: :unprocessable_entity
+        render json: {status: "error"}
+      end
     end
   end
 
