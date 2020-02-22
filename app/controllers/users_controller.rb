@@ -58,6 +58,13 @@ class UsersController < ApplicationController
   # DELETE /users/1
   def destroy
     @current_user.destroy
+    
+    fabs = Fab.where(user_id: @current_user.id)
+    fabs.destroy_all
+
+    words = Word.where(user_id: @current_user.id)
+    words.destroy_all
+    
     render json: {status: "success"}
   end
 
