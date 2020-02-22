@@ -27,7 +27,7 @@ class FabsController < ApplicationController
   # POST /fabs
   def create
     #@fab = Fab.new(fab_params)
-    @fab = Fab.new(word_id: fab_params[:word_id], user_id: @current_user.id)
+    @fab = Fab.new(word_id: fab_params[:word_id], user_id: @current_user.id, sex: @current_user.sex, birthday: @current_user.birthday, place: @current_user.place)
 
     if Fab.find_by(word_id: @fab.word_id, user_id: @fab.user_id).present?
       render json: {status: "already"}

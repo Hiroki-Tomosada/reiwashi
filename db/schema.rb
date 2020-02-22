@@ -15,6 +15,9 @@ ActiveRecord::Schema.define(version: 2020_02_16_045920) do
   create_table "fabs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "word_id"
     t.integer "user_id"
+    t.string "sex"
+    t.date "birthday"
+    t.string "place"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -36,9 +39,6 @@ ActiveRecord::Schema.define(version: 2020_02_16_045920) do
     t.string "name"
     t.integer "user_id"
     t.integer "tag_id"
-    t.string "sex"
-    t.date "birthday"
-    t.string "place"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

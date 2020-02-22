@@ -13,7 +13,14 @@ class WordsController < ApplicationController
     
     @period = params[:period]
     @page = params[:page].to_i
-    @age = params[:age].to_i
+    unless @age.blank? then
+      @age = params[:age].to_i
+      @birthday_start = Time.now - @age.year - 10.year
+      @birthday_end = Time.now - @age.year
+    else
+      @age = params[:age]
+    end
+
     @sex = params[:sex]
 
     @now_date = Date.today
@@ -34,29 +41,56 @@ class WordsController < ApplicationController
       render json: {status: "error"}
     end
 
-    @birthday_start = Time.now - @age.year - 10.year
-    @birthday_end = Time.now - @age.year
 
     #render plain: @start_date.to_s + @end_date.to_s
 
-    @words = Word.where('created_at >= ? and created_at <= ?', @start_date, @end_date)
+    #@all_ranks = Word.find(Fab.group(:word_id).order('count(word_id) desc').limit(30).pluck(:word_id))
+
+    @words = Word.where(:created_at => @start_date..@end_date)
 
     unless @sex.blank? then
-      @words = @words.where(sex: @sex)
-
       unless @age.blank? then
-        @words = @words.where('birthday >= ? and birthday <= ?', @birthday_start, @birthday_end)
+        @word_fab_count = Word.where(words: {:created_at => @start_date..@end_date}).joins(:fabs).where(fabs: {sex: @sex}).where(fabs: {:birthday => @birthday_start..@birthday_end}).group(:word_id).count
+        #render plain: "sex, age"
+      else
+        @word_fab_count = Word.where(words: {:created_at => @start_date..@end_date}).joins(:fabs).where(fabs: {sex: @sex}).group(:word_id).count
+        #render plain: "sex"
       end
     else
       unless @age.blank? then
-        @words = @words.where('birthday >= ? and birthday <= ?', @birthday_start, @birthday_end)
+        @word_fab_count = Word.where(words: {:created_at => @start_date..@end_date}).joins(:fabs).where(fabs: {:birthday => @birthday_start..@birthday_end}).group(:word_id).count
+        #render plain: "age"
+      else
+        @word_fab_count = Word.where(words: {:created_at => @start_date..@end_date}).joins(:fabs).group(:word_id).count
+        #render plain: "no"
       end
     end
 
-    @all_ranks = @words.find(Fab.group(:word_id).order('count(word_id) desc').limit(1).pluck(:word_id))
-
-    render json: @all_ranks
     
+    #render json: @words
+
+    #@word_fab_count = Word.where(words: {:created_at => @start_date..@end_date}).where(words: {:birthday => @birthday_start..@birthday_end}).where(words: {sex: @sex}).joins(:fabs).group(:word_id).count
+        
+    word_fabs_ids = Hash[@word_fab_count.sort_by{ |_, v| -v }].keys
+
+    if word_fabs_ids.blank? then
+      render json: {status: 'nothing'}
+    else
+      @word_ranking= Word.where(id: word_fabs_ids).order("field(id, #{word_fabs_ids.join(',')})")
+
+      #@response = []
+      #@word_ranking.each_with_index do |word, i|
+      #  @response << word
+      #end
+
+      #render json: @response, except:[:id, :user_id, :tag_id, :sex, :birthday, :place, :updated_at]
+      render json: {word: @word_ranking, fabs: @word_fab_count}
+    end
+    
+    #respond_to do |format|
+    #  format.html # => 通常のURLの場合、index.html.erb が返される
+    #  format.json { render json: @word_ranking } # URLが.jsonの場合、@products.to_json が返される
+    #end
    
   end
 
@@ -75,7 +109,7 @@ class WordsController < ApplicationController
   # POST /words
   def create
     # @word = Word.new(word_params)
-    @word = Word.new(name: word_params[:name], user_id: @current_user.id, sex: @current_user.sex, birthday: @current_user.birthday, place: @current_user.place)
+    @word = Word.new(name: word_params[:name], user_id: @current_user.id)
 
     if Word.find_by(name: @word.name).present?
       render json: {status: "already"}
