@@ -8,7 +8,7 @@ class UsersController < ApplicationController
     @user = User.find_by(email: params[:email])
 
     if @user && @user.authenticate(params[:password])
-      render json: {status: "success", token: @user.token}
+      render json: {status: "success", token: @user.token, user_id: @user.id}
     else
       render json: {status: "error"}
     end
@@ -36,7 +36,7 @@ class UsersController < ApplicationController
     else
       if @user.save
         #render json: @user.token, status: :created, location: @user
-        render json: {status: "success", token: @user.token}
+        render json: {status: "success", token: @user.token, user_id: @user.id}
       else
         #render json: @user.errors, status: :unprocessable_entity
         render json: {status: "error"}

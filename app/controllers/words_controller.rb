@@ -105,6 +105,11 @@ class WordsController < ApplicationController
   def show
     render json: @word
   end
+  
+  def mypage
+    books = Word.where(user_id: @current_user)
+    render json: books
+  end
 
   # POST /words
   def create
@@ -115,6 +120,9 @@ class WordsController < ApplicationController
       render json: {status: "already"}
     else
       if @word.save
+        last_id = Word.maximum(:id)
+        @fab = Fab.create(word_id: last_id, user_id: @current_user.id, sex: @current_user.sex, birthday: @current_user.birthday, place: @current_user.place)
+        
         #render json: @word, status: :created, location: @word
         render json: {status: "success"}
       else
@@ -135,7 +143,11 @@ class WordsController < ApplicationController
 
   # DELETE /words/1
   def destroy
+    fabs = Fab.where(word_id: @word.id)
+    fabs.destroy_all
     @word.destroy
+    
+    render json: {status: "success"}
   end
 
   private

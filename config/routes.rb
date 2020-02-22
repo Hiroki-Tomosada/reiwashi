@@ -3,6 +3,7 @@ Rails.application.routes.draw do
   post  'users/login' => 'users#login'
   #get   'fabs/api/' => 'fabs#api' # search
   get   'words/api/' => 'words#api' # search
+  get   'words/mypage' => 'words#mypage' # view my fabs
   get   'fabs/mypage' => 'fabs#mypage' # view my fabs
 
   post  'users/sign_in' => 'users#sign_in'
